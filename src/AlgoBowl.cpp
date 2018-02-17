@@ -19,11 +19,15 @@ using namespace std;
 int main (){
 
 	//first we need to read in the file
-	string input_filename = "test.txt";
+	string input_filename = "mehtaHeuristicInput.txt";
 	//cout << "Enter the input filename: ";
 	//cin >> input_filename;
 	ifstream inputFile;
 	inputFile.open(input_filename);
+	if (!inputFile.is_open()){
+		cerr << "Couldn't open the file" << endl;
+		return 1;
+	}
 
 	int num_vertices;
 	int num_edges;
@@ -46,7 +50,7 @@ int main (){
 	vector <int> sideA (num_vertices/2);
 	vector <int> sideB (num_vertices/2);
 	//initially, we will guess that we should just split the nodes in half
-	//from here forward we will denote node 1 as node 0 to make things simpler
+	//from here forward we will denote node "1" as node "0" to make things simpler
 	for (int i = 0; i < num_vertices/2; i++){
 		sideA.at(i)=i;
 	}
@@ -57,13 +61,24 @@ int main (){
 	//now that we have the split vectors, we find the cost
 	//TODO: make this a cost FUNCTION
 	int tot_cost = 0;
+	int largest_increase = 0;
 
+	cout << adjacency_matrix[0][366] << endl;
+
+	int for_times = 0;
 	for (int a: sideA){
 		for (int b: sideB){
 			tot_cost += adjacency_matrix[a][b];
+			for_times++;
+			if (adjacency_matrix[a][b] > 50){
+				cout << "there's an issue" << endl;
+				cout << adjacency_matrix[a][b] << endl;
+				cout << a << " " << b << endl;
+			}
 		}
 	}
-
+	cout << "Largest increase was: "<< largest_increase << endl;
+	cout << "For loop ran: " << for_times << " times" <<endl;
 	cout << "total cost is: " << tot_cost << endl;
 
 

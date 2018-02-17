@@ -19,7 +19,7 @@ using namespace std;
 int main (){
 
 	//first we need to read in the file
-	string input_filename = "InputFiles/inputfile.txt";
+	string input_filename = "test.txt";
 	//cout << "Enter the input filename: ";
 	//cin >> input_filename;
 	ifstream inputFile;

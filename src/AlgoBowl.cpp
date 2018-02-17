@@ -13,13 +13,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <set>
 using namespace std;
-
-//each edge has the node that it points to and the weight of the path.
-struct edge {
-	int node;
-	int weight;
-};
 
 int main (){
 
@@ -32,25 +27,53 @@ int main (){
 
 	int num_vertices;
 	int num_edges;
-	inputFile >> num_edges >> num_vertices;
-
-	vector <vector <edge>> adjacency_list(num_vertices);
+	inputFile >> num_vertices >> num_edges;
+	//make the adjacency matrix to store the points and weights
+	//it should be nxn where n is the number of vertices 
+	//This allows us to map to all other vertices
+	vector <vector <int>> adjacency_matrix(num_vertices, vector<int>(num_vertices));
+	
 	while (!inputFile.eof()){
-		int current_node;
-		edge edge_to_insert;
-		inputFile >> current_node >> edge_to_insert.node >> edge_to_insert.weight;
-		adjacency_list.at(current_node).push_back(edge_to_insert);
+		int currentVert, connectingNode, weight;
+		inputFile >> currentVert >> connectingNode >> weight;
+		//we need to use -1 because the graph is 0 indexed
+		//we also need to add the values to eachother since both are adjacent
+		adjacency_matrix.at(currentVert - 1).at(connectingNode - 1) += weight;
+		adjacency_matrix.at(connectingNode - 1).at(currentVert - 1) += weight;
 	}
-	cout << num_edges << " " << num_vertices << endl;
-	for (int i = 0; i < adjacency_list.size(); i++){
-		for (int j = 0; j < adjacency_list.at(i).size(); j++){
-			cout << i << " " << adjacency_list.at(i).at(j).node << " " << adjacency_list.at(i).at(j).weight << endl;
+
+	//define two vectors for the initial guess
+	vector <int> sideA (num_vertices/2);
+	vector <int> sideB (num_vertices/2);
+	//initially, we will guess that we should just split the nodes in half
+	//from here forward we will denote node 1 as node 0 to make things simpler
+	for (int i = 0; i < num_vertices/2; i++){
+		sideA.at(i)=i;
+	}
+	for (int i = num_vertices/2; i < num_vertices; i++){
+		sideB.at(i-(num_vertices/2))=i;
+	}
+
+	//now that we have the split vectors, we find the cost
+	//TODO: make this a cost FUNCTION
+	int tot_cost = 0;
+
+	for (int a: sideA){
+		for (int b: sideB){
+			tot_cost += adjacency_matrix[a][b];
 		}
 	}
+
+	cout << "total cost is: " << tot_cost << endl;
+
+
+
+
 	inputFile.close();
 
 	//next we can use the algorithm to find the best split
 	//todo: finish this
+	//for indices in set, sum across in the matrix
 
 	return 0;
 }

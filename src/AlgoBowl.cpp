@@ -28,6 +28,7 @@ int main (){
 		cerr << "Couldn't open the file" << endl;
 		return 1;
 	}
+    //test
 
 	int num_vertices;
 	int num_edges;

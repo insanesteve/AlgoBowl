@@ -14,28 +14,36 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <random>
 using namespace std;
 
 class Solver{
 	public:
+	//functions
 		bool import_data(string input_filename);
-		void run_simulated_annealing();
+		void run_simulated_annealing(int temp_max, int iterations_max);
 	private:
+	//functions
+		int find_cost(vector <int> side_a, vector <int> side_b);
+	//variables
 		int num_vertices;
 		int num_edges;
-		vector <vector <int> > adjacency_matrix;
 
+		vector <vector <int> > adjacency_matrix;
+		vector <int> best_side_a;
+		vector <int> best_side_b;
+		int lowest_cost;
 };
 
 int main (){
 
 	Solver solver;
-	if (!solver.import_data("InputFiles/stephenTest.txt")){
+	if (!solver.import_data("InputFiles/inputFile.txt")){
 		cerr << "Failed to import data" << endl;
 		return 1;
 	}
 
-	solver.run_simulated_annealing();
+	solver.run_simulated_annealing(1000,10);
 
 	return 0;
 }
@@ -69,28 +77,61 @@ bool Solver::import_data(string input_filename){
 }
 
 
-void Solver::run_simulated_annealing(){
-	//define two vectors for the initial guess
-	vector <int> side_a (num_vertices/2);
-	vector <int> side_b (num_vertices/2);
-	//initially, we will guess that we should just split the nodes in half
+void Solver::run_simulated_annealing(int temp_max, int iterations_max){
+	//define two vectors for the current guess
+	vector <int> curr_side_a (num_vertices/2);
+	vector <int> curr_side_b (num_vertices/2);
+	//initially, we will simply split the nodes in half
 	for (int i = 0; i < num_vertices/2; i++){
-		side_a.at(i)=i;
+		curr_side_a.at(i)=i;
 	}
 	for (int i = num_vertices/2; i < num_vertices; i++){
-		side_b.at(i-(num_vertices/2))=i;
+		curr_side_b.at(i-(num_vertices/2))=i;
 	}
+	//find the cost of the initial guess
+	int curr_cost = find_cost(curr_side_a, curr_side_b);
+	//since this is the first iteration, use it as the best case
+	best_side_a = curr_side_a;
+	best_side_b = curr_side_b;
+	lowest_cost = curr_cost;
 
-	//now that we have the split vectors, we find the cost
-	//TODO: make this a cost FUNCTION
-	int tot_cost = 0;
-
-	for (int a: side_a){
-		for (int b: side_b){
-			tot_cost += adjacency_matrix[a][b];
+	for (int i = 0; i < iterations_max; i++){
+		//swap a random index from current vectors
+		int index_a = rand()%num_vertices/2;
+		int index_b = rand()%num_vertices/2;
+		vector <int> pot_side_a = curr_side_a;
+		vector <int> pot_side_b = curr_side_b;
+		pot_side_a.at(index_a) = curr_side_b.at(index_b);
+		pot_side_b.at(index_b) = curr_side_a.at(index_a);
+		//check if the new cost is less than the current cost
+		int cost = find_cost(pot_side_a, pot_side_b);
+		//cout << cost << " " << curr_cost << endl;
+		if (cost < curr_cost){
+			//we should definitely keep it
+			curr_cost = cost;
+			curr_side_a = pot_side_a;
+			curr_side_b = pot_side_b;
+			cout << "Found a better cost: " << lowest_cost << endl;
+			//it might be the best so far
+			if (curr_cost < lowest_cost){
+				lowest_cost = curr_cost;
+				best_side_a = curr_side_a;
+				best_side_b = curr_side_b;
+				cout << "Found the best cost: " << lowest_cost << endl;
+			}
 		}
 	}
 
-	cout << "total cost is: " << tot_cost << endl;
+	cout << "total cost is: " << lowest_cost << endl;
+}
+
+int Solver::find_cost(vector <int> side_a, vector <int> side_b){
+	int tot_cost = 0;
+	for (int a: side_a){
+		for (int b: side_b){
+			tot_cost += adjacency_matrix.at(a).at(b);
+		}
+	}
+	return tot_cost;
 }
 

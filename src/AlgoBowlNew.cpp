@@ -15,6 +15,7 @@
 #include <string>
 #include <set>
 #include <random>
+#include <cmath>
 using namespace std;
 
 class Solver{
@@ -22,9 +23,11 @@ class Solver{
 	//functions
 		bool import_data(string input_filename);
 		void run_simulated_annealing(int temp_max, int iterations_max);
+		bool output_to_file(string output_filename);
 	private:
 	//functions
 		int find_cost(vector <int> side_a, vector <int> side_b);
+		int find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int rand_a, int rand_b);
 	//variables
 		int num_vertices;
 		int num_edges;
@@ -37,13 +40,21 @@ class Solver{
 
 int main (){
 
+	string inputFilename = "input1.txt";
+	srand(time(0));
 	Solver solver;
-	if (!solver.import_data("InputFiles/inputFile.txt")){
+	if (!solver.import_data("InputFiles/" + inputFilename)){
 		cerr << "Failed to import data" << endl;
 		return 1;
 	}
 
-	solver.run_simulated_annealing(1000,10);
+	//run with temp max and iterations per temp
+	solver.run_simulated_annealing(1000,100);
+
+	if (!solver.output_to_file("OutputFiles/" + inputFilename)){
+		cerr << "Failed to write output file" << endl;
+		return 1;
+	}
 
 	return 0;
 }
@@ -95,32 +106,43 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 	best_side_b = curr_side_b;
 	lowest_cost = curr_cost;
 
-	for (int i = 0; i < iterations_max; i++){
-		//swap a random index from current vectors
-		int index_a = rand()%num_vertices/2;
-		int index_b = rand()%num_vertices/2;
-		vector <int> pot_side_a = curr_side_a;
-		vector <int> pot_side_b = curr_side_b;
-		pot_side_a.at(index_a) = curr_side_b.at(index_b);
-		pot_side_b.at(index_b) = curr_side_a.at(index_a);
-		//check if the new cost is less than the current cost
-		int cost = find_cost(pot_side_a, pot_side_b);
-		//cout << cost << " " << curr_cost << endl;
-		if (cost < curr_cost){
-			//we should definitely keep it
-			curr_cost = cost;
-			curr_side_a = pot_side_a;
-			curr_side_b = pot_side_b;
-			cout << "Found a better cost: " << lowest_cost << endl;
-			//it might be the best so far
-			if (curr_cost < lowest_cost){
-				lowest_cost = curr_cost;
-				best_side_a = curr_side_a;
-				best_side_b = curr_side_b;
-				cout << "Found the best cost: " << lowest_cost << endl;
+	for (int current_temp = temp_max; current_temp > 0; current_temp--){
+		cout << "Temperature is: " << current_temp << endl;
+		for (int i = 0; i < iterations_max; i++){
+			//swap a random index from current vectors
+			int rand_a = rand()%num_vertices/2;
+			int rand_b = rand()%num_vertices/2;
+			vector <int> new_side_a = curr_side_a;
+			vector <int> new_side_b = curr_side_b;
+			new_side_a.at(rand_a) = curr_side_b.at(rand_b);
+			new_side_b.at(rand_b) = curr_side_a.at(rand_a);
+			//check if the new cost is less than the current cost
+			int cost = find_cost(new_side_a, new_side_b);
+			//cout << cost << " " << curr_cost << endl;
+			double prob_number = (double)(rand()%10000)/10000;
+			double current_exp = exp(((curr_cost - cost)/current_temp));
+			if (cost < curr_cost){
+				//we should definitely keep it
+				curr_cost = cost;
+				curr_side_a = new_side_a;
+				curr_side_b = new_side_b;
+				//it might be the best so far
+				if (curr_cost < lowest_cost){
+					lowest_cost = curr_cost;
+					best_side_a = curr_side_a;
+					best_side_b = curr_side_b;	
+					cout << "found best: " << lowest_cost << endl;
+				}
+			}
+			else if (current_exp > prob_number){
+				//we should probably keep it
+				curr_cost = cost;
+				curr_side_a = new_side_a;
+				curr_side_b = new_side_b;
 			}
 		}
 	}
+	
 
 	cout << "total cost is: " << lowest_cost << endl;
 }
@@ -134,4 +156,53 @@ int Solver::find_cost(vector <int> side_a, vector <int> side_b){
 	}
 	return tot_cost;
 }
+
+int Solver::find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int rand_a, int rand_b){
+	int new_cost = old_cost;
+	for (int b: old_b){
+		//we need to remove the old cost from the swapped a to all items in b
+		new_cost = new_cost - adjacency_matrix.at(rand_a).at(b);
+	}
+	cout << "New Cost1: " << new_cost << endl;
+	for (int a: old_a){
+		//we need to remove all but the index we already counted, or else we would double count
+		if (a != rand_a)
+		new_cost = new_cost - adjacency_matrix.at(a).at(rand_b);
+	}
+	cout << "New Cost2: " << new_cost << endl;
+	//now we add the cost from the swap to the new cost
+	for (int b: new_b){
+		new_cost += adjacency_matrix.at(rand_a).at(b);
+	}
+	cout << "New Cost3: " << new_cost << endl;
+	for (int a: new_a){
+		if (a != rand_a)
+		new_cost += adjacency_matrix.at(a).at(rand_b);
+	}
+	cout << "New Cost4: " << new_cost << endl;
+	return new_cost;
+
+}
+
+bool Solver::output_to_file(string output_filename){
+	ofstream output_file;
+	output_file.open(output_filename);
+	if (!output_file.is_open()){
+		cerr << "Failed to open the output file" << endl;
+		return false;
+	}
+
+	output_file << lowest_cost << endl;
+	for (int a: best_side_a){
+		output_file << a + 1 << " ";
+	}
+	output_file << endl;
+	for (int b: best_side_b){
+		output_file << b + 1 << " ";
+	}
+	output_file.close();
+
+	return true;
+}
+
 

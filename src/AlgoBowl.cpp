@@ -118,7 +118,7 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 
 	random_shuffle(all_points.begin(), all_points.end());
 
-	//initially, we will simply split the nodes in half
+	//initially, we will generate a random split
 	for (int i = 0; i < num_vertices/2; i++){
 		curr_side_a.push_back(all_points.at(i));
 		curr_side_b.push_back(all_points.at(i+num_vertices/2));
@@ -135,10 +135,10 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 	//now we start the looping algorithm
 	for (int current_temp = temp_max; current_temp > 0; current_temp--){
 		//print statements to track current temperature, at least for now
-		if (current_temp%100 == 0){
+		/*if (current_temp%100 == 0){
 			cout << "Temperature is: " << current_temp << endl;
 			cout << "Lowest is: " << lowest_cost << endl;
-		}
+		}*/
 		//loop for iterations_max at each temperature value
 		for (int i = 0; i < iterations_max; i++){
 			//swap a random index from current vectors
@@ -213,6 +213,7 @@ int Solver::find_new_cost(int old_cost, vector<int> &old_a, vector<int> &old_b, 
 }
 
 bool Solver::output_to_file(string output_filename){
+	cout << input_filename << ": " << endl;
 
 	ifstream input_file;
 	input_file.open(output_filename);
@@ -221,7 +222,7 @@ bool Solver::output_to_file(string output_filename){
 		int file_lowest_cost;
 		input_file >> file_lowest_cost;
 		if (file_lowest_cost <= lowest_cost){
-			cout << "Output found is not better than already found cost (" << file_lowest_cost << ")" << endl;
+			cout << "Output found is not better than already found cost (" << file_lowest_cost << ") ";
 			cout << "Not writing to file." << endl;
 			return true;
 		}

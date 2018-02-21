@@ -8,3 +8,4 @@ do
 	./AlgoBowl InputFiles/input_group$group.txt StephenOutputs/output_group$group.txt &
 	echo "done."
 done
+echo "Finished$int"

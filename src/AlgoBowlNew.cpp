@@ -39,18 +39,21 @@ class Solver{
 };
 
 int main (){
+	//seed for random to ensure randomness
+	srand(time(0));
 
 	string inputFilename = "input1.txt";
-	srand(time(0));
 	Solver solver;
+	//import the data into the solver
 	if (!solver.import_data("InputFiles/" + inputFilename)){
 		cerr << "Failed to import data" << endl;
 		return 1;
 	}
 
-	//run with temp max and iterations per temp
-	solver.run_simulated_annealing(1000,100);
+	//run simulated annealing (temp_max, max_iterations)
+	solver.run_simulated_annealing(100,100);
 
+	//output the data
 	if (!solver.output_to_file("OutputFiles/" + inputFilename)){
 		cerr << "Failed to write output file" << endl;
 		return 1;
@@ -60,18 +63,20 @@ int main (){
 }
 
 bool Solver::import_data(string input_filename){
-	//first we need to read in the file
+	//open the input file
 	ifstream input_file;
 	input_file.open(input_filename);
 	if (!input_file.is_open()){
 		cerr << "Couldn't open the input file" << endl;
+		//returns to main to let it know something failed
 		return false;
 	}
-	//the first line of the file contains number of vertices and edges
+
+	//the first line of the file must contain number of vertices and edges
 	input_file >> num_vertices >> num_edges;
 
 	//next we make the adjacency matrix to store the points and weights
-	//it should be nxn where n is the number of vertices 
+	//it should be nxn where n is the number of vertices
 	vector <vector <int> > temp_adj_matrix(num_vertices, vector<int>(num_vertices));
 
 	while (!input_file.eof()){
@@ -84,6 +89,7 @@ bool Solver::import_data(string input_filename){
 	}
 	adjacency_matrix = temp_adj_matrix;
 	input_file.close();
+	//success!
 	return true;
 }
 
@@ -106,8 +112,11 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 	best_side_b = curr_side_b;
 	lowest_cost = curr_cost;
 
+	//now we start the looping algorithm
 	for (int current_temp = temp_max; current_temp > 0; current_temp--){
+		//print statements to track current temperature, at least for now
 		cout << "Temperature is: " << current_temp << endl;
+		//loop for iterations_max at each temperature value
 		for (int i = 0; i < iterations_max; i++){
 			//swap a random index from current vectors
 			int rand_a = rand()%num_vertices/2;
@@ -116,33 +125,36 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 			vector <int> new_side_b = curr_side_b;
 			new_side_a.at(rand_a) = curr_side_b.at(rand_b);
 			new_side_b.at(rand_b) = curr_side_a.at(rand_a);
-			//check if the new cost is less than the current cost
+			//find the new cost
 			int cost = find_cost(new_side_a, new_side_b);
-			//cout << cost << " " << curr_cost << endl;
+			//definitions for simulated annealing
+			//prob_number is the random double from 0-1
+			//current_exp is the exponential value to determine probability
 			double prob_number = (double)(rand()%10000)/10000;
 			double current_exp = exp(((curr_cost - cost)/current_temp));
-			if (cost < curr_cost){
-				//we should definitely keep it
+			//if the cost is better than the current cost, we should keep the swap
+			//note that it is also set for sideways hill climbing (<"=")
+			if (cost <= curr_cost){
 				curr_cost = cost;
 				curr_side_a = new_side_a;
 				curr_side_b = new_side_b;
-				//it might be the best so far
+				//it also might be the best so far
 				if (curr_cost < lowest_cost){
 					lowest_cost = curr_cost;
 					best_side_a = curr_side_a;
-					best_side_b = curr_side_b;	
+					best_side_b = curr_side_b;
+					//print the current best cost, at least for now	
 					cout << "found best: " << lowest_cost << endl;
 				}
 			}
+			//if the current swap is worse, but within our probability margin, we still keep it
 			else if (current_exp > prob_number){
-				//we should probably keep it
 				curr_cost = cost;
 				curr_side_a = new_side_a;
 				curr_side_b = new_side_b;
 			}
 		}
 	}
-	
 
 	cout << "total cost is: " << lowest_cost << endl;
 }
@@ -181,7 +193,6 @@ int Solver::find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, ve
 	}
 	cout << "New Cost4: " << new_cost << endl;
 	return new_cost;
-
 }
 
 bool Solver::output_to_file(string output_filename){

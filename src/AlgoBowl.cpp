@@ -16,6 +16,7 @@
 #include <set>
 #include <random>
 #include <cmath>
+#include <algorithm>
 using namespace std;
 
 class Solver{
@@ -36,6 +37,8 @@ class Solver{
 		vector <int> best_side_a;
 		vector <int> best_side_b;
 		int lowest_cost;
+
+		string input_filename;
 };
 
 int main (int argc, char* argv[]){
@@ -72,6 +75,7 @@ int main (int argc, char* argv[]){
 }
 
 bool Solver::import_data(string input_filename){
+	this->input_filename = input_filename;
 	//open the input file
 	ifstream input_file;
 	input_file.open(input_filename);
@@ -105,15 +109,21 @@ bool Solver::import_data(string input_filename){
 
 void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 	//define two vectors for the current guess
-	vector <int> curr_side_a (num_vertices/2);
-	vector <int> curr_side_b (num_vertices/2);
+	vector <int> all_points(num_vertices);
+	vector <int> curr_side_a;
+	vector <int> curr_side_b;
+	for (int i = 0; i < num_vertices; i++){
+		all_points.at(i) = i;
+	}
+
+	random_shuffle(all_points.begin(), all_points.end());
+
 	//initially, we will simply split the nodes in half
 	for (int i = 0; i < num_vertices/2; i++){
-		curr_side_a.at(i)=i;
+		curr_side_a.push_back(all_points.at(i));
+		curr_side_b.push_back(all_points.at(i+num_vertices/2));
 	}
-	for (int i = num_vertices/2; i < num_vertices; i++){
-		curr_side_b.at(i-(num_vertices/2))=i;
-	}
+
 	//find the cost of the initial guess
 	int curr_cost = find_cost(curr_side_a, curr_side_b);
 
@@ -167,8 +177,7 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 			}
 		}
 	}
-
-	cout << "total cost is: " << lowest_cost << endl;
+	cout << "Finished " + input_filename + " total cost is: " << lowest_cost << endl;
 }
 
 int Solver::find_cost(vector <int> side_a, vector <int> side_b){
@@ -225,7 +234,6 @@ bool Solver::output_to_file(string output_filename){
 		cerr << "Failed to open the output file" << endl;
 		return false;
 	}
-
 	cout << "Writing to file..." << endl;
 	output_file << lowest_cost << endl;
 	for (int a: best_side_a){

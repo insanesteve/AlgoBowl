@@ -48,11 +48,11 @@ int main (int argc, char* argv[]){
 		return 1;
 	}
 	//set the filename
-	string inputFilename = argv[1];
+	string input_filename = argv[1];
 
 	Solver solver;
 	//import the data into the solver
-	if (!solver.import_data("InputFiles/" + inputFilename)){
+	if (!solver.import_data("InputFiles/" + input_filename)){
 		cerr << "Failed to import data" << endl;
 		return 1;
 	}
@@ -62,7 +62,7 @@ int main (int argc, char* argv[]){
 	solver.run_simulated_annealing(2000,1000);
 
 	//output the data
-	if (!solver.output_to_file("OutputFiles/" + inputFilename)){
+	if (!solver.output_to_file("OutputFiles/" + input_filename)){
 		cerr << "Failed to write output file" << endl;
 		return 1;
 	}

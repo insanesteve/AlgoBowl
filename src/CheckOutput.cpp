@@ -18,9 +18,16 @@ int find_cost(vector <int> side_a, vector <int> side_b);
 //need this to be global so we can access it
 vector <vector <int> > adjacency_matrix;
 
-int main (){
+int main (int argc, char* argv[]){
 
-	string input_filename = "input1.txt";
+	//get the filename from the command line and notify if one was not inserted
+	if (argc < 2){
+		cerr << "Usage: " << argv[0] << " FILENAME" << endl;
+		return 1;
+	}
+	//set the filename
+	string input_filename = argv[1];
+
 	
 	int num_vertices;
 	int num_edges;

@@ -1,12 +1,12 @@
 /* 
 	CSCI 406: AlgoBowl Project
 
-	Authors: Stephen Agee, Alex Santilli, and Michaela Serpas
+	Author: Stephen Agee
 
 	This program takes in the input file (which represents a graph
 	with nodes and weighted edges) and finds a good way to split
 	the graph into two while intersecting the lowest amount of 
-	weight.  
+	weight. It uses the "Simulated Annealing" algorithm.  
 */
 
 #include <iostream>
@@ -38,11 +38,17 @@ class Solver{
 		int lowest_cost;
 };
 
-int main (){
+int main (int argc, char* argv[]){
 	//seed for random to ensure randomness
 	srand(time(0));
 
-	string inputFilename = "input1.txt";
+	if (argc < 2){
+		cerr << "Usage: " << argv[0] << " FILENAME" << endl;
+		return 1;
+	}
+	
+	string inputFilename = argv[1];
+
 	Solver solver;
 	//import the data into the solver
 	if (!solver.import_data("InputFiles/" + inputFilename)){

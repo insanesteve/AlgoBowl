@@ -7,7 +7,7 @@
 PROGNAME = AlgoBowl 
 
 # All the dependencies of the final program
-OBJS = AlgoBowlNew.o 
+OBJS = AlgoBowlNew.o
 
 # The compiler being used
 CC = g++

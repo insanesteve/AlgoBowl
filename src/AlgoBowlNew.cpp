@@ -42,11 +42,12 @@ int main (int argc, char* argv[]){
 	//seed for random to ensure randomness
 	srand(time(0));
 
+	//get the filename from the command line and notify if one was not inserted
 	if (argc < 2){
 		cerr << "Usage: " << argv[0] << " FILENAME" << endl;
 		return 1;
 	}
-	
+	//set the filename
 	string inputFilename = argv[1];
 
 	Solver solver;

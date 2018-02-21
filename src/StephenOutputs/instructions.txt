@@ -1,0 +1,6 @@
+To compile from the command line on Linux and Mac:
+	for the main algorithm
+		"g++ -o AlgoBowl AlgoBowl.cpp -std=c++11"
+	for the output check file
+	"g++ -o CheckOutpu CheckOutput.cpp -std=c++11"
+I have also put this into a script called CompileAll, which can be run by typing "./CompileAll.sh" into your terminal window. If it has permissions issues, simply type "chmod +x CompileAll.sh".

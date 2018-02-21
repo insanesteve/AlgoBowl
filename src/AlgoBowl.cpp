@@ -58,6 +58,7 @@ int main (int argc, char* argv[]){
 	}
 
 	//run simulated annealing (temp_max, max_iterations)
+	//2000,1000
 	solver.run_simulated_annealing(2000,1000);
 
 	//output the data
@@ -202,6 +203,21 @@ int Solver::find_new_cost(int old_cost, vector<int> &old_a, vector<int> &old_b, 
 }
 
 bool Solver::output_to_file(string output_filename){
+
+	ifstream input_file;
+	input_file.open(output_filename);
+	if (input_file.is_open()){
+		//the output file already exists so we should check to see if our new output is better
+		int file_lowest_cost;
+		input_file >> file_lowest_cost;
+		if (file_lowest_cost <= lowest_cost){
+			cout << "Output found is not better than already found cost (" << file_lowest_cost << ")" << endl;
+			cout << "Not writing to file." << endl;
+			return true;
+		}
+	}
+
+	//otherwise, nothing changes
 	ofstream output_file;
 	output_file.open(output_filename);
 	if (!output_file.is_open()){
@@ -209,6 +225,7 @@ bool Solver::output_to_file(string output_filename){
 		return false;
 	}
 
+	cout << "Writing to file..." << endl;
 	output_file << lowest_cost << endl;
 	for (int a: best_side_a){
 		output_file << a + 1 << " ";

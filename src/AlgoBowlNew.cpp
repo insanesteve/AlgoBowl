@@ -27,7 +27,7 @@ class Solver{
 	private:
 	//functions
 		int find_cost(vector <int> side_a, vector <int> side_b);
-		int find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int rand_a, int rand_b);
+		int find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int swap_a, int swap_b);
 	//variables
 		int num_vertices;
 		int num_edges;
@@ -58,7 +58,7 @@ int main (int argc, char* argv[]){
 	}
 
 	//run simulated annealing (temp_max, max_iterations)
-	solver.run_simulated_annealing(100,100);
+	solver.run_simulated_annealing(1000,1000);
 
 	//output the data
 	if (!solver.output_to_file("OutputFiles/" + inputFilename)){
@@ -114,6 +114,7 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 	}
 	//find the cost of the initial guess
 	int curr_cost = find_cost(curr_side_a, curr_side_b);
+
 	//since this is the first iteration, use it as the best case
 	best_side_a = curr_side_a;
 	best_side_b = curr_side_b;
@@ -133,7 +134,8 @@ void Solver::run_simulated_annealing(int temp_max, int iterations_max){
 			new_side_a.at(rand_a) = curr_side_b.at(rand_b);
 			new_side_b.at(rand_b) = curr_side_a.at(rand_a);
 			//find the new cost
-			int cost = find_cost(new_side_a, new_side_b);
+			//int cost = find_cost(new_side_a, new_side_b);
+			int cost = find_new_cost(curr_cost, curr_side_a, curr_side_b, new_side_a, new_side_b, curr_side_a.at(rand_a), curr_side_b.at(rand_b));
 			//definitions for simulated annealing
 			//prob_number is the random double from 0-1
 			//current_exp is the exponential value to determine probability
@@ -176,29 +178,25 @@ int Solver::find_cost(vector <int> side_a, vector <int> side_b){
 	return tot_cost;
 }
 
-int Solver::find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int rand_a, int rand_b){
+int Solver::find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int swap_a, int swap_b){
 	int new_cost = old_cost;
 	for (int b: old_b){
 		//we need to remove the old cost from the swapped a to all items in b
-		new_cost = new_cost - adjacency_matrix.at(rand_a).at(b);
+		new_cost = new_cost - adjacency_matrix.at(swap_a).at(b);
 	}
-	cout << "New Cost1: " << new_cost << endl;
 	for (int a: old_a){
 		//we need to remove all but the index we already counted, or else we would double count
-		if (a != rand_a)
-		new_cost = new_cost - adjacency_matrix.at(a).at(rand_b);
+		if (a != swap_a)
+		new_cost = new_cost - adjacency_matrix.at(a).at(swap_b);
 	}
-	cout << "New Cost2: " << new_cost << endl;
 	//now we add the cost from the swap to the new cost
 	for (int b: new_b){
-		new_cost += adjacency_matrix.at(rand_a).at(b);
+		new_cost += adjacency_matrix.at(swap_b).at(b);
 	}
-	cout << "New Cost3: " << new_cost << endl;
 	for (int a: new_a){
-		if (a != rand_a)
-		new_cost += adjacency_matrix.at(a).at(rand_b);
+		if (a != swap_b)
+		new_cost += adjacency_matrix.at(a).at(swap_a);
 	}
-	cout << "New Cost4: " << new_cost << endl;
 	return new_cost;
 }
 

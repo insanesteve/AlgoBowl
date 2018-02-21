@@ -27,7 +27,7 @@ class Solver{
 	private:
 	//functions
 		int find_cost(vector <int> side_a, vector <int> side_b);
-		int find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int swap_a, int swap_b);
+		int find_new_cost(int old_cost, vector<int> &old_a, vector<int> &old_b, vector<int> &new_a, vector<int> &new_b, int swap_a, int swap_b);
 	//variables
 		int num_vertices;
 		int num_edges;
@@ -179,7 +179,7 @@ int Solver::find_cost(vector <int> side_a, vector <int> side_b){
 	return tot_cost;
 }
 
-int Solver::find_new_cost(int old_cost, vector<int> old_a, vector<int> old_b, vector<int> new_a, vector<int> new_b, int swap_a, int swap_b){
+int Solver::find_new_cost(int old_cost, vector<int> &old_a, vector<int> &old_b, vector<int> &new_a, vector<int> &new_b, int swap_a, int swap_b){
 	int new_cost = old_cost;
 	for (int b: old_b){
 		//we need to remove the old cost from the swapped a to all items in b

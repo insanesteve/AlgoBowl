@@ -43,16 +43,17 @@ int main (int argc, char* argv[]){
 	srand(time(0));
 
 	//get the filename from the command line and notify if one was not inserted
-	if (argc < 2){
-		cerr << "Usage: " << argv[0] << " FILENAME" << endl;
+	if (argc < 3){
+		cerr << "Usage: " << argv[0] << " INPUT_FILEPATH " << "OUTPUT_FILEPATH" << endl;
 		return 1;
 	}
 	//set the filename
-	string input_filename = argv[1];
+	string input_filepath = argv[1];
+	string output_filepath = argv[2];
 
 	Solver solver;
 	//import the data into the solver
-	if (!solver.import_data("InputFiles/" + input_filename)){
+	if (!solver.import_data(input_filepath)){
 		cerr << "Failed to import data" << endl;
 		return 1;
 	}
@@ -62,7 +63,7 @@ int main (int argc, char* argv[]){
 	solver.run_simulated_annealing(2000,1000);
 
 	//output the data
-	if (!solver.output_to_file("OutputFiles/" + input_filename)){
+	if (!solver.output_to_file(output_filepath)){
 		cerr << "Failed to write output file" << endl;
 		return 1;
 	}

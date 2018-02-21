@@ -22,7 +22,7 @@ int main (int argc, char* argv[]){
 
 	//get the filename from the command line and notify if one was not inserted
 	if (argc < 2){
-		cerr << "Usage: " << argv[0] << " FILENAME" << endl;
+		cerr << "Usage: " << argv[0] << " INPUT FILENAME" << endl;
 		return 1;
 	}
 	//set the filename

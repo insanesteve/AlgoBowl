@@ -5,6 +5,6 @@
 for group in {1..28}
 do
 	echo "Starting input_group$group.txt"
-	./AlgoBowl input_group$group.txt
+	./AlgoBowl InputFiles/input_group$group.txt AlexOutputs/output_group$group.txt
 	echo "done."
 done

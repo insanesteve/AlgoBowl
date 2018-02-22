@@ -21,12 +21,13 @@ vector <vector <int> > adjacency_matrix;
 int main (int argc, char* argv[]){
 
 	//get the filename from the command line and notify if one was not inserted
-	if (argc < 2){
-		cerr << "Usage: " << argv[0] << " INPUT FILENAME" << endl;
+	if (argc < 3){
+		cerr << "Usage: " << argv[0] << " RESOURCE FILENAME" << " INPUT FILENAME" << endl;
 		return 1;
 	}
 	//set the filename
-	string input_filename = argv[1];
+	string resource_filename = argv[1];
+	string input_filename = argv[2];
 
 	
 	int num_vertices;
@@ -37,9 +38,9 @@ int main (int argc, char* argv[]){
 	vector <int> proposed_b;
 
 	ifstream input_file;
-	input_file.open("InputFiles/" + input_filename);
+	input_file.open(resource_filename);
 	if (!input_file.is_open()){
-		cerr << "Couldn't open the input file" << endl;
+		cerr << "Couldn't open the resource file" << endl;
 		return 0;
 	}
 	//the first line of the file contains number of vertices and edges
@@ -54,15 +55,15 @@ int main (int argc, char* argv[]){
 		input_file >> current_vert >> connecting_node >> weight;
 		//we need to subtract 1 since the graph is 1 indexed
 		//we also need to add the values to eachother since both are adjacent
-		temp_adj_matrix.at(current_vert - 1).at(connecting_node - 1) = weight;
-		temp_adj_matrix.at(connecting_node - 1).at(current_vert - 1) = weight;
+		temp_adj_matrix.at(current_vert - 1).at(connecting_node - 1) += weight;
+		temp_adj_matrix.at(connecting_node - 1).at(current_vert - 1) += weight;
 	}
 	adjacency_matrix = temp_adj_matrix;
 	input_file.close();
 
-	input_file.open("OutputFiles/" + input_filename);
+	input_file.open(input_filename);
 	if (!input_file.is_open()){
-		cerr << "Couldn't open the output input file" << endl;
+		cerr << "Couldn't open the input file" << endl;
 		return 0;
 	}
 	

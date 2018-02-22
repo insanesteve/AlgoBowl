@@ -97,8 +97,8 @@ bool Solver::import_data(string input_filename){
 		input_file >> current_vert >> connecting_node >> weight;
 		//we need to subtract 1 since the graph is 1 indexed
 		//we also need to add the values to eachother since both are adjacent
-		temp_adj_matrix.at(current_vert - 1).at(connecting_node - 1) = weight;
-		temp_adj_matrix.at(connecting_node - 1).at(current_vert - 1) = weight;
+		temp_adj_matrix.at(current_vert - 1).at(connecting_node - 1) += weight;
+		temp_adj_matrix.at(connecting_node - 1).at(current_vert - 1) += weight;
 	}
 	adjacency_matrix = temp_adj_matrix;
 	input_file.close();

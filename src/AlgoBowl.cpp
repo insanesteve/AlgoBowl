@@ -17,6 +17,7 @@
 #include <random>
 #include <cmath>
 #include <algorithm>
+#include <ctime>
 using namespace std;
 
 class Solver{

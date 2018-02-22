@@ -50,9 +50,11 @@ int main (int argc, char* argv[]){
 	//it should be nxn where n is the number of vertices 
 	vector <vector <int> > temp_adj_matrix(num_vertices, vector<int>(num_vertices));
 
-	while (!input_file.eof()){
+	//while (!input_file.eof()){
+	for (int i = 0; i < num_edges; i++){
 		int current_vert, connecting_node, weight;
 		input_file >> current_vert >> connecting_node >> weight;
+		//cout << current_vert << " " << connecting_node << " " << weight << endl;
 		//we need to subtract 1 since the graph is 1 indexed
 		//we also need to add the values to eachother since both are adjacent
 		temp_adj_matrix.at(current_vert - 1).at(connecting_node - 1) += weight;
@@ -61,6 +63,12 @@ int main (int argc, char* argv[]){
 	adjacency_matrix = temp_adj_matrix;
 	input_file.close();
 
+	/*for (vector<int> outside : adjacency_matrix){
+		for (int inside: outside){
+			cout << inside << " ";
+		}
+		cout << endl;
+	}*/
 	input_file.open(input_filename);
 	if (!input_file.is_open()){
 		cerr << "Couldn't open the input file" << endl;
@@ -82,12 +90,15 @@ int main (int argc, char* argv[]){
 	}
 
 	int calculated_cost = find_cost(proposed_a, proposed_b);
+	cout << "Input File: " << input_filename << endl;
 	cout << "Proposed cost: " << proposed_cost << endl;
 	cout << "Calculated cost: " << calculated_cost << endl;
 	if (proposed_cost == calculated_cost){
 		cout << "Outputs are a MATCH!" << endl;
 	}
 	else cout << "Uh oh, looks like something went wrong" << endl;
+
+	cout << endl;
 
 	return 0;
 }

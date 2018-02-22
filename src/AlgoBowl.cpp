@@ -93,7 +93,8 @@ bool Solver::import_data(string input_filename){
 	//it should be nxn where n is the number of vertices
 	vector <vector <int> > temp_adj_matrix(num_vertices, vector<int>(num_vertices));
 
-	while (!input_file.eof()){
+	//while (!input_file.eof()){
+	for (int i = 0; i < num_edges; i++){
 		int current_vert, connecting_node, weight;
 		input_file >> current_vert >> connecting_node >> weight;
 		//we need to subtract 1 since the graph is 1 indexed

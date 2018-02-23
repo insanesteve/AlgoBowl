@@ -7,7 +7,7 @@ do
 	for group in {1..27}
 	do
 		echo "Starting input_group$group.txt"
-		./AlgoBowlLong InputFilesNew/input_group$group.txt StephenOutputs/output_group$group.txt
+		./AlgoBowl InputFilesNew/input_group$group.txt StephenOutputs/output_group$group.txt &
 		echo "done."
 		echo "iteration: $int"
 	done

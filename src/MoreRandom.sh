@@ -7,7 +7,7 @@ do
 	for group in {1..27}
 	do
 		echo "Starting input_group$group.txt"
-		./AlgoBowlNew PlzHelp/input_group$group.txt AlgoBowlMoreRandom/output_group$group.txt &
+		./AlgoBowlMoreRandom PlzHelp/input_group$group.txt MoreRandom/output_group$group.txt &
 		echo "done."
 	done
 	wait
